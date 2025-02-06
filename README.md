@@ -88,10 +88,24 @@ Schema items are accessed using the `&` prefix. These are configured through the
 
 ## 🌟 Special Variables
 
+Special variables are predefined and can be used directly in your templates without the `{{` and `}}` delimiters:
+
 - `$_SECTION` or `$_section`: References current section's class (`.theme-section-X`)
 - `$_S_CLASS` or `$_s_class`: References current section's class name (`theme-section-X`)
 - `$_FORM[name]`: Generates form submission URL
 - `$_REDIRECTFORM[name]`: Generates form submission URL with redirect
+
+For example:
+```fire
+/* Trying to add some css that would only apply to buttons inside this section */
+<style>
+    $_section button {
+        background-color: #000;
+        color: #fff;
+    }
+</style>
+
+```
 
 ## 🚀 System API Reference
 
@@ -256,18 +270,6 @@ Schema items are accessed using the `&` prefix. These are configured through the
   - Returns: Removes cookie
 - `system.cookie.destroy()` → void
   - Returns: Removes all cookies
-
-### Database API
-- `system.db.query($query, $params)` → mixed
-  - Returns: Raw query results
-- `system.db.get_data($query, $params)` → array
-  - Returns: Single row result
-- `system.db.get_loop_data($query, $params)` → array
-  - Returns: Multiple row results
-- `system.db.insert($table, $query, $params)` → integer
-  - Returns: ID of inserted row
-- `system.db.update($table, $query, $params)` → boolean
-  - Returns: Success status
 
 ### Posts API
 - `system.posts.get_posts()` → array
