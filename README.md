@@ -325,7 +325,7 @@ For example:
 - `system.string.concat($str1, $str2)` → string
   - Returns: Concatenated string
 - `system.string.parse($str)` → mixed
-  - Returns: Parsed JSON string as PHP value
+  - Returns: Parsed JSON string
 - `system.string.to_int($str)` → integer
   - Returns: String converted to integer
 
