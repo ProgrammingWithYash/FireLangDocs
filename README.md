@@ -1,14 +1,16 @@
 # 🔥 Fire Template Language Documentation
 
 ## 📚 Table of Contents
-1. [Basic Syntax](#basic-syntax)
-2. [Variables](#variables)
-3. [Control Structures](#control-structures)
-4. [Comments](#comments)
-5. [Schema Variables](#schema-variables)
-6. [System API Reference](#system-api-reference)
-7. [Special Variables](#special-variables)
-8. [Best Practices](#best-practices)
+1. [Basic Syntax](#-basic-syntax)
+2. [Variables](#-variables)
+3. [Control Structures](#-control-structures)
+4. [Comments](#-comments)
+5. [Schema Variables](#-schema-variables)
+6. [System API Reference](#-system-api-reference)
+7. [Special Variables](#-special-variables)
+8. [String Concatenation](#-string-concatenation)
+9. [Best Practices](#-best-practices)
+10. [Error Handling](#-error-handling)
 
 ## 🎯 Basic Syntax
 
