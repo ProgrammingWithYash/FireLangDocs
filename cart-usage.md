@@ -38,6 +38,7 @@ Here is the essential structure. Copy and paste this into your product page.
                 <!-- This is a template for a SINGLE variant option. It will be duplicated for each option in the group. -->
                 <flicksell-template-variant-pill class="my-custom-pill-style">
                     <!-- The option name (e.g., "Red", "Large") will be inserted here. -->
+                    <!-- Note: For "Color" variants, this pill is automatically populated with rich swatch/image content. -->
                 </flicksell-template-variant-pill>
             </flicksell-variant-pills>
         </flicksell-variant-group>
@@ -80,7 +81,7 @@ Here is the essential structure. Copy and paste this into your product page.
 
 ### 1.2: Styling Your Cart
 
-You have 100% control over the appearance using CSS. The system adds helpful attributes to the generated elements for easy styling.
+You have 100% control over the appearance using CSS. The system adds helpful attributes and elements to the generated pills for easy styling.
 
 #### Key CSS Selectors:
 
@@ -89,9 +90,12 @@ You have 100% control over the appearance using CSS. The system adds helpful att
 | `flicksell-template-variant-pill`             | Styles all variant pills.                                                                                     |
 | `flicksell-template-variant-pill[selected]`   | Styles the pill the user has currently selected.                                                              |
 | `flicksell-template-variant-pill[disabled]`   | Styles pills for unavailable variant combinations.                                                            |
-| `[dynamic-source-color-pill]`                 | Specifically targets pills generated from a Color Dynamic Source, allowing for unique styling (e.g., no text).  |
 | `flicksell-template-add-to-cart[hidden]`      | These elements get a `hidden` attribute when not active. Use this selector to hide them.                        |
 | `flicksell-template-update-cart[hidden]`      | A reliable way to hide them is `[hidden] { display: none !important; }`.                                      |
+| `[dynamic-source-color-pill]`                 | Targets pills generated from a Color source for special styling.                                              |
+| `[dynamic-source-color-images]`               | The inner `<span>` that the system injects to hold the color swatch or image.                                 |
+| `[dynamic-source-color-text]`                 | The inner `<span>` that the system injects to hold the color name.                                            |
+
 
 #### Example CSS:
 
@@ -127,6 +131,27 @@ flicksell-template-variant-pill[disabled] {
     opacity: 0.4;
     cursor: not-allowed;
     background-color: #f3f4f6;
+}
+
+/* Example: Create swatch-only pills for colors by targeting the auto-injected elements */
+flicksell-template-variant-pill[dynamic-source-color-pill] {
+    /* Reset padding for a square look */
+    padding: 2px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Make it a circle */
+}
+
+/* Hide the color name text inside the pill */
+[dynamic-source-color-text] {
+    display: none;
+}
+
+/* Make the auto-injected image container fill the pill */
+[dynamic-source-color-images] {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 ```
 
@@ -245,80 +270,7 @@ By default, changing the quantity in the `<flicksell-template-update-cart>` bloc
 
 ---
 
-## 🎨 Chapter 3: Mastering Dynamic Sources (Colors)
-
-For variants based on "Dynamic Sources" like colors, you can create a much richer and more visual selection experience.
-
-### 3.1: Rich Color Templates
-
-Provide a special template inside `<flicksell-dynamic-source-templates>` to override the default pill structure for color options.
-
-```html
-<flicksell-template-cart product-id="456">
-    <flicksell-variant-groups>
-        <!-- This is a fallback template for non-dynamic variants (e.g., Size) -->
-        <flicksell-variant-group>
-            <flicksell-variant-pills>
-                <flicksell-template-variant-pill class="pill-size"></flicksell-template-variant-pill>
-            </flicksell-variant-pills>
-        </flicksell-variant-group>
-    </flicksell-variant-groups>
-
-    <!-- Define a special, rich template JUST for dynamic sources -->
-    <flicksell-dynamic-source-templates>
-        <flicksell-dynamic-source-template source="color">
-            <!-- 
-              This HTML will be used for any pill generated from a "Color" source.
-              The system will automatically populate the inner elements.
-            -->
-            <div class="color-pill-wrapper" title="The color name will be here">
-                <!-- Populated with color swatch/image -->
-                <span dynamic-source-color-images></span> 
-                <!-- Populated with color name -->
-                <span dynamic-source-color-text></span>
-            </div>
-        </flicksell-dynamic-source-template>
-    </flicksell-dynamic-source-templates>
-    
-    <!-- ... pricing and action buttons ... -->
-</flicksell-template-cart>
-```
-
-### 3.2: Styling Hooks for Dynamic Pills
-
-When using dynamic source templating, the system adds special attributes to help you write highly specific CSS.
-
--   `[dynamic-source-color-pill]`: Added to the root `<flicksell-template-variant-pill>` if it's a color.
--   `[dynamic-source-color-images]`: The `<span>` containing the visual color swatch/image.
--   `[dynamic-source-color-text]`: The `<span>` containing the color name.
-
-**Example:** Create a swatch-only pill by hiding the text.
-
-```css
-flicksell-template-variant-pill[dynamic-source-color-pill] {
-    /* Reset padding for a square look */
-    padding: 2px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%; /* Make it a circle */
-}
-
-/* Hide the color name text */
-[dynamic-source-color-text] {
-    display: none;
-}
-
-/* Make the image container fill the pill */
-[dynamic-source-color-images] {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-```
-
----
-
-## 📚 Appendix: API & Events
+## 📚 Chapter 3: API & Events
 
 ### Required Server Endpoints
 
