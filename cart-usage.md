@@ -178,6 +178,7 @@ Execute custom JavaScript whenever the user selects a different combination of v
 
 -   `on-variant-change`: A global JavaScript function to call when the selected variant changes.
 -   `combination-image-callback`: A more specific callback just for updating an image based on the `img` property of the selected variant.
+-   `combination-not-selected-callback`: Called when user tries to add to cart without selecting a valid combination.
 
 ```html
 <img id="main-product-image" src="/path/to/default.jpg" alt="Product Image">
@@ -185,7 +186,8 @@ Execute custom JavaScript whenever the user selects a different combination of v
 <flicksell-template-cart 
     product-id="123"
     on-variant-change="myGlobalVariantUpdater"
-    combination-image-callback="updateMainImage">
+    combination-image-callback="updateMainImage"
+    combination-not-selected-callback="handleNoSelection">
 </flicksell-template-cart>
 
 <script>
@@ -212,6 +214,12 @@ function myGlobalVariantUpdater(combinationString, variantData) {
     } else {
         shippingElement.textContent = 'Currently out of stock.';
     }
+}
+
+// Called when user tries to add to cart without selecting a combination
+function handleNoSelection() {
+    alert('Please select all product options before adding to cart.');
+    // Or show a more elegant notification
 }
 </script>
 ```
@@ -266,8 +274,121 @@ By default, changing the quantity in the `<flicksell-template-update-cart>` bloc
         <button>Update</button>
     </flicksell-template-update-button>
 </flicksell-template-update-cart>
+```
 
-### 2.5: Customizing Dynamic Source Display (e.g., Colors)
+### 2.5: Linking Multiple Cart Elements
+
+You can link multiple `<flicksell-template-cart>` elements together so they work as a single unit. This is perfect for complex product pages where you want to show variant selections in different locations (e.g., color picker in the gallery, size selector in the product details).
+
+```html
+<!-- Main cart element with cart functionality -->
+<flicksell-template-cart 
+    product-id="123" 
+    id="main-cart"
+    linked-with="color-selector,size-selector">
+    
+    <!-- This element handles the cart actions -->
+    <flicksell-template-add-to-cart>
+        <button>Add to Cart</button>
+    </flicksell-template-add-to-cart>
+    
+    <!-- Show all variant groups here -->
+    <flicksell-variant-groups>
+        <flicksell-variant-group>
+            <flicksell-variant-group-label></flicksell-variant-group-label>
+            <flicksell-variant-pills>
+                <flicksell-template-variant-pill></flicksell-template-variant-pill>
+            </flicksell-variant-pills>
+        </flicksell-variant-group>
+    </flicksell-variant-groups>
+</flicksell-template-cart>
+
+<!-- Color selector in the image gallery area -->
+<flicksell-template-cart 
+    product-id="123" 
+    id="color-selector"
+    fetch-only="Color">
+    
+    <!-- Only show Color variants here -->
+    <flicksell-variant-groups>
+        <flicksell-variant-group>
+            <flicksell-variant-pills>
+                <flicksell-template-variant-pill class="color-swatch"></flicksell-template-variant-pill>
+            </flicksell-variant-pills>
+        </flicksell-variant-group>
+    </flicksell-variant-groups>
+</flicksell-template-cart>
+
+<!-- Size selector in the product details -->
+<flicksell-template-cart 
+    product-id="123" 
+    id="size-selector"
+    fetch-only="Size">
+    
+    <!-- Only show Size variants here -->
+    <flicksell-variant-groups>
+        <flicksell-variant-group>
+            <flicksell-variant-group-label></flicksell-variant-group-label>
+            <flicksell-variant-pills>
+                <flicksell-template-variant-pill class="size-pill"></flicksell-template-variant-pill>
+            </flicksell-variant-pills>
+        </flicksell-variant-group>
+    </flicksell-variant-groups>
+</flicksell-template-cart>
+```
+
+**How Linking Works:**
+
+1. The main element (with `linked-with` attribute) coordinates all linked elements
+2. When a user selects a variant in any linked element, all elements update together
+3. Only the main element shows cart controls and handles cart actions
+4. All elements share the same product data and selection state
+
+### 2.6: Filtering Variant Groups with fetch-only
+
+Use the `fetch-only` attribute to show only specific variant groups. This is perfect for creating specialized variant selectors or when you want to split variant selection across different UI sections.
+
+```html
+<!-- Show only Color and Material variants -->
+<flicksell-template-cart 
+    product-id="123" 
+    fetch-only="Color,Material">
+    
+    <flicksell-variant-groups>
+        <flicksell-variant-group>
+            <flicksell-variant-group-label></flicksell-variant-group-label>
+            <flicksell-variant-pills>
+                <flicksell-template-variant-pill></flicksell-template-variant-pill>
+            </flicksell-variant-pills>
+        </flicksell-variant-group>
+    </flicksell-variant-groups>
+</flicksell-template-cart>
+```
+
+**Note:** When using `fetch-only`, the system automatically selects the first option from hidden variant groups to ensure a valid combination is always available.
+
+### 2.7: Disabling Auto-Selection
+
+By default, the system automatically selects the first available option from each variant group. Use `no-auto-select` to disable this behavior if you want users to explicitly choose all options.
+
+```html
+<!-- User must select all options manually -->
+<flicksell-template-cart 
+    product-id="123" 
+    no-auto-select>
+    
+    <flicksell-variant-groups>
+        <flicksell-variant-group>
+            <flicksell-variant-group-label></flicksell-variant-group-label>
+            <flicksell-variant-pills>
+                <flicksell-template-variant-pill></flicksell-template-variant-pill>
+            </flicksell-variant-pills>
+        </flicksell-variant-group>
+    </flicksell-variant-groups>
+</flicksell-template-cart>
+```
+
+### 2.8: Customizing Dynamic Source Display (e.g., Colors)
 
 When you have variants that use a dynamic data source, like "Color", the system automatically renders rich content like color swatches or images inside the variant pills. You can control how this content is displayed using the `color-source-style` attribute.
 
@@ -290,6 +411,37 @@ When you have variants that use a dynamic data source, like "Color", the system 
 | `text-compact`   | A more condensed text-only version, which might show a count (e.g., "3 colors").                        |
 | `visual-only`    | Renders only the visual swatch, with no text. This is great for creating clean, circular color pickers. |
 
+#### Override Dynamic Source Settings
+
+You can override specific visual settings for dynamic sources using override attributes:
+
+```html
+<!-- Override color display settings -->
+<flicksell-template-cart 
+    product-id="123" 
+    color-source-style="visual-only"
+    override-color-source-radius="20"
+    override-color-source-shadow="strong"
+    override-color-source-border_style="dark"
+    override-color-source-rotation="45">
+    ...
+</flicksell-template-cart>
+```
+
+#### Available Override Settings:
+
+| Attribute                                    | Description                                                    | Values                                    |
+| -------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------- |
+| `override-color-source-radius`               | Border radius for color boxes                                 | Number (pixels)                          |
+| `override-color-source-shadow`               | Shadow intensity                                               | `none`, `light`, `medium`, `strong`       |
+| `override-color-source-border_style`         | Border style                                                   | `none`, `light`, `medium`, `dark`         |
+| `override-color-source-rotation`             | Rotation angle for multi-color stripes                        | Number (degrees)                          |
+| `override-color-source-use_grid_layout`      | Use grid layout for 4 colors                                  | `true`, `false`                           |
+| `override-color-source-rotation_2_colors`    | Specific rotation for 2-color combinations                     | Number (degrees)                          |
+| `override-color-source-rotation_3_colors`    | Specific rotation for 3-color combinations                     | Number (degrees)                          |
+| `override-color-source-rotation_4_colors`    | Specific rotation for 4-color combinations                     | Number (degrees)                          |
+| `override-color-source-rotation_5_colors`    | Specific rotation for 5+ color combinations                    | Number (degrees)                          |
+
 ---
 
 ## 📚 Chapter 3: API & Events
@@ -299,9 +451,10 @@ When you have variants that use a dynamic data source, like "Color", the system 
 For the template cart to function, your server must expose these endpoints:
 
 1.  **`/flicksell-template-cart-data?product_id={id}`**: (GET) Returns a JSON object with all product and variant data.
-2.  **`/flicksell-product-cart-status?product_id={id}`**: (GET) Returns a JSON object indicating which variants of this product are in the current user's cart and their quantities.
-3.  **`/flicksell-add-to-cart`**: (POST) Adds an item to the cart. Expects `product_id`, `combination`, and `quantity`.
-4.  **`/flicksell-update-cart`**: (POST) Updates an item's quantity in the cart. Expects `product_id`, `combination`, and `quantity`.
+2.  **`/flicksell-template-cart-data`**: (POST) Batch endpoint for multiple products. Expects `{ product_ids: [...] }` in request body.
+3.  **`/flicksell-product-cart-status?product_id={id}`**: (GET) Returns a JSON object indicating which variants of this product are in the current user's cart and their quantities.
+4.  **`/flicksell-add-to-cart`**: (POST) Adds an item to the cart. Expects `product_id`, `combination`, and `quantity`.
+5.  **`/flicksell-update-cart`**: (POST) Updates an item's quantity in the cart. Expects `product_id`, `combination`, and `quantity`.
 
 ### Global Cart Event
 
@@ -319,3 +472,115 @@ document.addEventListener('flicksell:cartUpdated', function(event) {
     }
 });
 ```
+
+### Performance Optimizations
+
+The template cart system includes several performance optimizations:
+
+#### Batch Data Fetching
+
+When multiple template cart elements are present on the same page, the system automatically batches their data requests to reduce server load:
+
+```html
+<!-- These will be fetched in a single batch request -->
+<flicksell-template-cart product-id="123"></flicksell-template-cart>
+<flicksell-template-cart product-id="456"></flicksell-template-cart>
+<flicksell-template-cart product-id="789"></flicksell-template-cart>
+```
+
+#### Intelligent Polling
+
+When multiple elements use polling, the system coordinates their updates to minimize server requests:
+
+```html
+<!-- These will poll together, not separately -->
+<flicksell-template-cart product-id="123" poll="10"></flicksell-template-cart>
+<flicksell-template-cart product-id="456" poll="10"></flicksell-template-cart>
+```
+
+#### Change Detection
+
+The system only re-renders when data actually changes, preventing unnecessary DOM updates during polling.
+
+---
+
+## 🎨 Chapter 4: Dynamic Source Templates
+
+For advanced customization of dynamic source content (like colors), you can provide custom templates:
+
+```html
+<flicksell-template-cart product-id="123">
+    
+    <!-- Your variant groups as usual -->
+    <flicksell-variant-groups>
+        <flicksell-variant-group>
+            <flicksell-variant-pills>
+                <flicksell-template-variant-pill></flicksell-template-variant-pill>
+            </flicksell-variant-pills>
+        </flicksell-variant-group>
+    </flicksell-variant-groups>
+    
+    <!-- Custom templates for dynamic sources -->
+    <flicksell-dynamic-source-templates>
+        <!-- Template for color variants -->
+        <flicksell-dynamic-source-template source="color">
+            <div class="custom-color-pill">
+                <flicksell-variant-color-box class="color-swatch"></flicksell-variant-color-box>
+                <flicksell-variant-name class="color-name"></flicksell-variant-name>
+            </div>
+        </flicksell-dynamic-source-template>
+        
+        <!-- Default template for other dynamic sources -->
+        <flicksell-dynamic-source-template source="default">
+            <span class="variant-name"></span>
+        </flicksell-dynamic-source-template>
+    </flicksell-dynamic-source-templates>
+    
+</flicksell-template-cart>
+```
+
+This allows you to create completely custom layouts for how dynamic source content is displayed within variant pills.
+
+---
+
+## 🔧 Chapter 5: Complete Attribute Reference
+
+### Main Element Attributes
+
+| Attribute                          | Type     | Description                                                                                          |
+| ---------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| `product-id`                       | String   | **Required.** The ID of the product to load                                                         |
+| `poll`                             | Number   | Polling interval in seconds (minimum 2)                                                             |
+| `mode`                             | String   | `normal` (default) or `move-to-cart` for specialized behavior                                        |
+| `linked-with`                      | String   | Comma-separated list of element IDs to link with this cart                                          |
+| `fetch-only`                       | String   | Comma-separated list of variant group names to display                                              |
+| `no-auto-select`                   | Boolean  | Disable automatic selection of first options                                                        |
+| `color-source-style`               | String   | Display style for color variants: `full`, `compact`, `text-only`, `text-compact`, `visual-only`    |
+| `on-variant-change`                | String   | Global function name to call when variant selection changes                                         |
+| `on-cart-action`                   | String   | Global function name to call after cart actions (for move-to-cart mode)                            |
+| `combination-image-callback`       | String   | Global function name to call when combination image should update                                   |
+| `combination-not-selected-callback`| String   | Global function name to call when user tries to add to cart without valid selection                |
+| `override-color-source-*`          | Various  | Override specific visual settings for color display (see section 2.8)                             |
+
+### Child Elements
+
+| Element                                        | Purpose                                                                                      |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `<flicksell-skeleton>`                         | Loading state content                                                                        |
+| `<flicksell-variant-groups>`                   | Container for all variant groups                                                             |
+| `<flicksell-variant-group>`                    | Template for a single variant group                                                          |
+| `<flicksell-variant-group-label>`              | Label for the variant group (auto-populated)                                                |
+| `<flicksell-variant-pills>`                    | Container for variant options                                                                |
+| `<flicksell-template-variant-pill>`            | Template for a single variant option                                                         |
+| `<flicksell-template-add-to-cart>`             | Add to cart button container                                                                 |
+| `<flicksell-template-update-cart>`             | Update cart controls container                                                               |
+| `<flicksell-template-quantity-input>`          | Quantity input field                                                                         |
+| `<flicksell-template-quantity-increment>`      | Increase quantity button                                                                     |
+| `<flicksell-template-quantity-decrement>`      | Decrease quantity button                                                                     |
+| `<flicksell-template-update-button>`           | Manual update button (disables auto-update)                                                 |
+| `<flicksell-template-product-price>`           | Current price display                                                                        |
+| `<flicksell-template-product-mrp>`             | Original price display                                                                       |
+| `<flicksell-dynamic-source-templates>`         | Container for custom dynamic source templates                                                |
+| `<flicksell-dynamic-source-template>`          | Custom template for dynamic source content                                                   |
+
+This comprehensive guide should help you leverage all the powerful features of the FlickSell Template Cart system!
