@@ -266,7 +266,29 @@ By default, changing the quantity in the `<flicksell-template-update-cart>` bloc
         <button>Update</button>
     </flicksell-template-update-button>
 </flicksell-template-update-cart>
+
+### 2.5: Customizing Dynamic Source Display (e.g., Colors)
+
+When you have variants that use a dynamic data source, like "Color", the system automatically renders rich content like color swatches or images inside the variant pills. You can control how this content is displayed using the `color-source-style` attribute.
+
+```html
+<!-- Control how color swatches are rendered -->
+<flicksell-template-cart 
+    product-id="123" 
+    color-source-style="compact">
+    ...
+</flicksell-template-cart>
 ```
+
+#### Available Display Modes:
+
+| Mode             | Description                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------- |
+| `full` (default) | Shows the visual swatch/image alongside the full color name (e.g., "Midnight Blue").                     |
+| `compact`        | Shows the visual swatch and a summarized name (e.g., "Midnight Blue +2 more").                           |
+| `text-only`      | Shows only the color names, without the visual swatch.                                                  |
+| `text-compact`   | A more condensed text-only version, which might show a count (e.g., "3 colors").                        |
+| `visual-only`    | Renders only the visual swatch, with no text. This is great for creating clean, circular color pickers. |
 
 ---
 
